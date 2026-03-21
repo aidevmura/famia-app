@@ -32,7 +32,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body className="bg-purple-50 antialiased">
+      <body className="bg-purple-50 antialiased" suppressHydrationWarning>
         <StoreProvider>
           {children}
         </StoreProvider>

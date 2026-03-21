@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react'
+import React, { createContext, useContext, useReducer, useEffect, useCallback, useState } from 'react'
 import type { AppState, Profile, Task, TaskCompletion, AvatarItem, UserAvatarItem, FamilyRule, Family, AvatarConfig } from '@/types'
 import { DEMO_STATE } from './demo-data'
 import { format } from 'date-fns'
@@ -178,6 +178,7 @@ const StoreContext = createContext<StoreContextType | null>(null)
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, DEMO_STATE)
+  const [hydrated, setHydrated] = useState(false)
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -186,12 +187,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       if (saved) {
         const parsed = JSON.parse(saved) as AppState
         dispatch({ type: 'INIT', payload: parsed })
-      } else {
-        dispatch({ type: 'INIT', payload: DEMO_STATE })
       }
     } catch {
-      dispatch({ type: 'INIT', payload: DEMO_STATE })
+      // use default DEMO_STATE
     }
+    setHydrated(true)
   }, [])
 
   // Save to localStorage whenever state changes
@@ -285,6 +285,17 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const equipItem = useCallback((item: AvatarItem, userId: string) => {
     dispatch({ type: 'EQUIP_ITEM', payload: { userId, itemId: item.id, avatarChanges: item.avatarChanges } })
   }, [])
+
+  if (!hydrated) {
+    return (
+      <div className="min-h-dvh flex items-center justify-center bg-purple-50">
+        <div className="text-center">
+          <div className="text-5xl mb-3 animate-bounce">🌈</div>
+          <p className="text-purple-500 font-bold">よみこみ中...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <StoreContext.Provider value={{

@@ -34,29 +34,32 @@ export default function CelebrationModal({ isOpen, points, message, onClose }: C
           <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
 
           {/* Confetti */}
-          {CONFETTI.map((emoji, i) => (
-            <motion.div
-              key={i}
-              className="absolute text-3xl pointer-events-none"
-              style={{
-                left: `${10 + Math.random() * 80}%`,
-                top: `${Math.random() * 30}%`,
-              }}
-              initial={{ y: -50, opacity: 0, rotate: 0 }}
-              animate={{
-                y: window.innerHeight,
-                opacity: [0, 1, 1, 0],
-                rotate: Math.random() * 360,
-              }}
-              transition={{
-                duration: 2 + Math.random(),
-                delay: Math.random() * 0.5,
-                ease: 'linear',
-              }}
-            >
-              {emoji}
-            </motion.div>
-          ))}
+          {CONFETTI.map((emoji, i) => {
+            const positions = [
+              { l: 12, t: 5, r: 180, dur: 2.2, d: 0.0 },
+              { l: 25, t: 10, r: 90, dur: 2.5, d: 0.1 },
+              { l: 38, t: 3, r: 270, dur: 2.1, d: 0.2 },
+              { l: 50, t: 8, r: 45, dur: 2.8, d: 0.0 },
+              { l: 63, t: 15, r: 315, dur: 2.3, d: 0.3 },
+              { l: 75, t: 5, r: 135, dur: 2.6, d: 0.1 },
+              { l: 88, t: 12, r: 225, dur: 2.0, d: 0.2 },
+              { l: 20, t: 20, r: 60, dur: 2.4, d: 0.0 },
+              { l: 55, t: 25, r: 300, dur: 2.7, d: 0.4 },
+            ]
+            const p = positions[i] ?? positions[0]
+            return (
+              <motion.div
+                key={i}
+                className="absolute text-3xl pointer-events-none"
+                style={{ left: `${p.l}%`, top: `${p.t}%` }}
+                initial={{ y: -50, opacity: 0, rotate: 0 }}
+                animate={{ y: 700, opacity: [0, 1, 1, 0], rotate: p.r }}
+                transition={{ duration: p.dur, delay: p.d, ease: 'linear' }}
+              >
+                {emoji}
+              </motion.div>
+            )
+          })}
 
           {/* Card */}
           <motion.div

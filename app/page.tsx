@@ -24,18 +24,18 @@ export default function LandingPage() {
     <div className="min-h-dvh flex flex-col items-center justify-center bg-gradient-to-b from-purple-100 via-pink-50 to-yellow-50 px-6 py-12">
       {/* Stars decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {['⭐', '✨', '🌟', '💫', '⭐', '✨'].map((star, i) => (
+        {[
+          { s: '⭐', l: 10, t: 5 }, { s: '✨', l: 25, t: 20 }, { s: '🌟', l: 40, t: 8 },
+          { s: '💫', l: 60, t: 18 }, { s: '⭐', l: 75, t: 5 }, { s: '✨', l: 88, t: 22 },
+        ].map((item, i) => (
           <motion.div
             key={i}
             className="absolute text-2xl opacity-40"
-            style={{
-              left: `${10 + i * 15}%`,
-              top: `${5 + (i % 3) * 15}%`,
-            }}
+            style={{ left: `${item.l}%`, top: `${item.t}%` }}
             animate={{ y: [0, -10, 0], rotate: [0, 15, 0] }}
             transition={{ duration: 3 + i * 0.5, repeat: Infinity, delay: i * 0.3 }}
           >
-            {star}
+            {item.s}
           </motion.div>
         ))}
       </div>
