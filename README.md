@@ -1,36 +1,119 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🌈 ファミア (Famia)
 
-## Getting Started
+> かぞくみんなで目標を立てて、たのしくお手伝いをしよう！
 
-First, run the development server:
+家族向けのお手伝い・習慣管理アプリです。子どもがタスクをこなすとポイントが貯まり、アバターの着せ替えアイテムと交換できます。
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## ✨ 機能一覧
+
+| 機能 | 説明 |
+|---|---|
+| 🔑 家族ログイン | 親：メール+パスワード / 子ども：ピクチャーパスワード |
+| 📋 タスク管理 | お手伝い・習慣・ルーティンの登録・管理 |
+| ✅ タスク達成記録 | 「できた！」「ひとりでできた！(+5pt)」の記録 |
+| ⭐ ポイントシステム | タスク達成でポイントゲット |
+| 👗 アバター着せ替え | ポイントでアイテムを購入してアバターをカスタマイズ |
+| 📊 家族ダッシュボード | 家族全員の今日の達成状況を一覧表示 |
+| 📜 家族のルールBOX | 家族で決めたルールを記録・参照 |
+
+---
+
+## 🚀 デモで試す（今すぐ）
+
+```
+パパでログイン：
+  なまえ: パパ
+  パスワード: papa123
+
+きこでログイン：
+  ファミリーコード: KIKO01
+  ピクチャーパスワード: 🐱 → 🐰 → 🐻
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📱 スマホへのインストール方法（PWA）
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. このURLをSafari（iOS）またはChrome（Android）で開く
+2. iOS: 「共有」→「ホーム画面に追加」
+3. Android: メニュー →「アプリをインストール」
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🛠️ 開発者向けセットアップ
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 必要なもの
+- Node.js 18+
+- npm
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### インストール
 
-## Deploy on Vercel
+```bash
+git clone <このリポジトリ>
+cd famia-app
+npm install
+npm run dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+`http://localhost:3000` でアクセスできます。
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 🚢 Vercelへのデプロイ
+
+1. このリポジトリをGitHubにプッシュ
+2. [Vercel](https://vercel.com) にログイン
+3. 「New Project」→ GitHubリポジトリを選択
+4. 「Deploy」をクリック
+
+環境変数は現時点では不要です（デモモードで動作）。
+
+---
+
+## 📝 現在のデータについて
+
+現バージョンはデモモードで動作します：
+- データは**ブラウザのlocalStorage**に保存
+- **デバイス間でのデータ共有は未対応**（次フェーズでSupabase連携予定）
+- アプリを消去するとデータはリセットされます
+
+### 次フェーズ（Supabase連携後）
+- 家族全員でリアルタイムデータ共有
+- どのデバイスからでもアクセス可能
+- データの永続化
+
+---
+
+## 🗺️ ロードマップ
+
+### v1（現在）- デモプロトタイプ
+- [x] ログイン（親・子ども）
+- [x] タスク登録・達成
+- [x] ポイントシステム
+- [x] アバター着せ替え
+- [x] ショップ機能
+- [x] 家族ダッシュボード
+
+### v2 - データ共有対応
+- [ ] Supabase連携（クロスデバイス同期）
+- [ ] 週次カレンダー表示
+- [ ] プッシュ通知（リマインダー）
+- [ ] 週次会議ファシリテーターモード
+
+### v3 - 拡張機能
+- [ ] 週末ルール連動（平日達成率 → 週末自由度）
+- [ ] 実績バッジ・トロフィー
+- [ ] 兄弟姉妹対応強化
+- [ ] 音声入力対応
+
+---
+
+## 💬 フィードバック
+
+このアプリはファミリーのフィードバックをもとに改善していきます。気になった点・追加してほしい機能はどんどん教えてください！
+
+---
+
+**作成**: 2026年3月 | **技術スタック**: Next.js 14 + Tailwind CSS + Framer Motion
