@@ -114,9 +114,18 @@ export default function TodayTaskPointsPanel({
   if (variant === 'homeHeader') {
     return (
       <div className="flex flex-col gap-2 min-w-0 flex-1">
-        {earnedBadge}
+        <div className="flex flex-wrap items-center gap-2">
+          {showCompletionBadge && totalCount > 0 && (
+            <div className="bg-white/20 rounded-xl px-3 py-1.5 text-xs sm:text-sm font-bold">
+              ✅ {completedCount}/{totalCount}こ おわり
+            </div>
+          )}
+          {earnedBadge}
+        </div>
         {hasIncomplete && <div className={remainingBoxClass}>{remainingInner}</div>}
-        {allDoneTasks && <p className="text-purple-100 text-xs font-bold">🎉 きょうのポイント ぜんぶゲット！</p>}
+        {allDoneTasks && totalCount > 0 && (
+          <p className="text-purple-100 text-xs font-bold">🎉 きょうのタスク ぜんぶ おわり！ポイントもぜんぶゲット！</p>
+        )}
       </div>
     )
   }
@@ -134,9 +143,18 @@ export default function TodayTaskPointsPanel({
   if (variant === 'shop') {
     return (
       <div className="flex flex-col gap-2 min-w-0 flex-1">
-        {earnedBadge}
+        <div className="flex flex-wrap items-center gap-2">
+          {showCompletionBadge && totalCount > 0 && (
+            <div className="bg-white/30 rounded-xl px-2.5 py-1 text-xs font-bold text-yellow-950">
+              ✅ {completedCount}/{totalCount}こ おわり
+            </div>
+          )}
+          {earnedBadge}
+        </div>
         {hasIncomplete && <div className={remainingBoxClass}>{remainingInner}</div>}
-        {allDoneTasks && <p className="text-yellow-100 text-xs font-bold">🎉 きょうのタスクのポイントは ぜんぶゲット！</p>}
+        {allDoneTasks && totalCount > 0 && (
+          <p className="text-yellow-100 text-xs font-bold">🎉 きょうのタスクのポイントは ぜんぶゲット！</p>
+        )}
       </div>
     )
   }
@@ -144,9 +162,18 @@ export default function TodayTaskPointsPanel({
   if (variant === 'avatar') {
     return (
       <div className="mt-3 space-y-2">
-        <div className="flex justify-center">{earnedBadge}</div>
+        <div className="flex flex-wrap justify-center items-center gap-2">
+          {showCompletionBadge && totalCount > 0 && (
+            <div className="bg-white/20 rounded-xl px-3 py-1.5 text-xs sm:text-sm font-bold">
+              ✅ {completedCount}/{totalCount}こ おわり
+            </div>
+          )}
+          {earnedBadge}
+        </div>
         {hasIncomplete && <div className={remainingBoxClass}>{remainingInner}</div>}
-        {allDoneTasks && <p className="text-purple-100 text-xs font-bold text-center">🎉 きょうのポイント ぜんぶゲット！</p>}
+        {allDoneTasks && totalCount > 0 && (
+          <p className="text-purple-100 text-xs font-bold text-center">🎉 きょうのポイント ぜんぶゲット！</p>
+        )}
       </div>
     )
   }

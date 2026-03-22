@@ -19,6 +19,8 @@ type Action =
   | { type: 'PURCHASE_ITEM'; payload: { userId: string; item: AvatarItem } }
   | { type: 'EQUIP_ITEM'; payload: { userId: string; itemId: string; avatarChanges: Partial<AvatarConfig> } }
   | { type: 'ADD_FAMILY_RULE'; payload: FamilyRule }
+  | { type: 'UPDATE_FAMILY_RULE'; payload: Partial<FamilyRule> & { id: string } }
+  | { type: 'DELETE_FAMILY_RULE'; payload: string }
   | { type: 'UPDATE_PROFILE'; payload: Partial<Profile> & { id: string } }
 
 const STORAGE_KEY = 'famia-state'
@@ -141,6 +143,20 @@ function reducer(state: AppState, action: Action): AppState {
 
     case 'ADD_FAMILY_RULE':
       return { ...state, familyRules: [...state.familyRules, action.payload] }
+
+    case 'UPDATE_FAMILY_RULE':
+      return {
+        ...state,
+        familyRules: state.familyRules.map(r =>
+          r.id === action.payload.id ? { ...r, ...action.payload } : r
+        ),
+      }
+
+    case 'DELETE_FAMILY_RULE':
+      return {
+        ...state,
+        familyRules: state.familyRules.filter(r => r.id !== action.payload),
+      }
 
     case 'UPDATE_PROFILE':
       return {

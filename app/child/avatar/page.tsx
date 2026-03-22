@@ -70,7 +70,7 @@ export default function ChildAvatarPage() {
             <span className="text-xs text-purple-200">もってる！</span>
           </div>
 
-          <TodayTaskPointsPanel summary={pointsSummary} variant="avatar" />
+          <TodayTaskPointsPanel summary={pointsSummary} variant="avatar" showCompletionBadge />
         </div>
       </div>
 

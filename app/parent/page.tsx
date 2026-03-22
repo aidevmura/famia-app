@@ -12,6 +12,7 @@ import { format } from 'date-fns'
 import { ja } from 'date-fns/locale'
 import { CATEGORY_LABELS, FREQUENCY_LABELS, getTodayTaskPointsSummary } from '@/lib/utils'
 import TodayTaskPointsPanel from '@/components/TodayTaskPointsPanel'
+import FamilyRulesManager from '@/components/FamilyRulesManager'
 
 export default function ParentHomePage() {
   const router = useRouter()
@@ -242,31 +243,16 @@ export default function ParentHomePage() {
           </div>
         </div>
 
-        {/* Family Rules */}
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="font-black text-gray-700 text-base">📜 家族のルールBOX</h2>
+        {/* Family Rules（編集可） */}
+        {currentFamily && (
+          <div className="bg-white rounded-3xl p-4 shadow-sm border border-gray-100">
+            <FamilyRulesManager
+              familyId={currentFamily.id}
+              editorProfileId={currentProfile.id}
+              theme="parent"
+            />
           </div>
-          <div className="space-y-2">
-            {state.familyRules
-              .filter(r => r.familyId === currentFamily?.id)
-              .map((rule, i) => (
-                <motion.div
-                  key={rule.id}
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 + i * 0.05 }}
-                  className="bg-white rounded-2xl px-4 py-3 shadow-sm border border-gray-100 flex items-center gap-3"
-                >
-                  <span className="text-xl">📜</span>
-                  <div className="flex-1">
-                    <p className="font-bold text-gray-800 text-sm">{rule.title}</p>
-                    <p className="text-gray-500 text-xs mt-0.5 line-clamp-1">{rule.content}</p>
-                  </div>
-                </motion.div>
-              ))}
-          </div>
-        </div>
+        )}
 
         {/* Invite code info */}
         {currentFamily && (

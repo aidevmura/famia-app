@@ -11,6 +11,7 @@ import { generateId, PICTURE_PASSWORD_EMOJIS } from '@/lib/utils'
 import { DEFAULT_GIRL_AVATAR, DEFAULT_BOY_AVATAR } from '@/lib/avatar-items'
 import PicturePassword from '@/components/PicturePassword'
 import type { Profile } from '@/types'
+import FamilyRulesManager from '@/components/FamilyRulesManager'
 
 export default function ParentFamilyPage() {
   const { currentProfile, currentFamily, state, dispatch, getChildProfiles, getParentProfiles } = useStore()
@@ -191,6 +192,15 @@ export default function ParentFamilyPage() {
             )}
           </motion.div>
         )}
+
+        {/* 家族のルールBOX（編集・削除・追加） */}
+        <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
+          <FamilyRulesManager
+            familyId={currentFamily.id}
+            editorProfileId={currentProfile.id}
+            theme="parent"
+          />
+        </div>
       </div>
 
       <BottomNav />

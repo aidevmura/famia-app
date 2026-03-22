@@ -73,7 +73,7 @@ export default function ChildShopPage() {
               </div>
               <span className="text-yellow-100 text-sm font-medium">もってる</span>
             </div>
-            <TodayTaskPointsPanel summary={pointsSummary} variant="shop" />
+            <TodayTaskPointsPanel summary={pointsSummary} variant="shop" showCompletionBadge />
           </div>
         </div>
       </div>

@@ -11,6 +11,7 @@ import TaskCard from '@/components/TaskCard'
 import CelebrationModal from '@/components/CelebrationModal'
 import BottomNav from '@/components/BottomNav'
 import TodayTaskPointsPanel from '@/components/TodayTaskPointsPanel'
+import FamilyRulesManager from '@/components/FamilyRulesManager'
 import { format } from 'date-fns'
 import { ja } from 'date-fns/locale'
 import { getTodayTaskPointsSummary } from '@/lib/utils'
@@ -32,7 +33,6 @@ export default function ChildHomePage() {
   const todayTasks = getTodayTasks(currentProfile.id)
   const completedCount = todayTasks.filter(t => isTaskCompletedToday(t.id, currentProfile.id)).length
   const totalCount = todayTasks.length
-  const progress = totalCount > 0 ? (completedCount / totalCount) * 100 : 0
   const todayDate = format(new Date(), 'M月d日(E)', { locale: ja })
   const pointsSummary = getTodayTaskPointsSummary(
     state,
@@ -98,7 +98,7 @@ export default function ChildHomePage() {
                 </div>
                 <span className="text-purple-200 text-xs font-bold">もってる</span>
               </div>
-              <TodayTaskPointsPanel summary={pointsSummary} variant="homeHeader" />
+              <TodayTaskPointsPanel summary={pointsSummary} variant="homeHeader" showCompletionBadge />
               <p className="text-white/90 font-bold text-sm">{getMotivationMessage()}</p>
             </div>
           </div>
@@ -106,42 +106,20 @@ export default function ChildHomePage() {
       </div>
 
       <div className="max-w-lg mx-auto px-5 mt-5 space-y-5">
-        {/* Progress Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-3xl p-5 shadow-sm"
-        >
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="font-black text-gray-800 text-lg">きょうのタスク</h2>
-            <span className="text-sm font-bold text-purple-600 bg-purple-50 px-3 py-1 rounded-full">
-              {completedCount} / {totalCount}
-            </span>
-          </div>
-
-          {/* Progress bar */}
-          <div className="w-full bg-gray-100 rounded-full h-4 mb-3 overflow-hidden">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.8, ease: 'easeOut' }}
-              className="h-full rounded-full bg-gradient-to-r from-purple-400 to-pink-400"
+        {/* 家族のルールBOX（旧「きょうのタスク」カードの位置） */}
+        {currentFamily && (
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-3xl p-5 shadow-sm border-2 border-purple-100"
+          >
+            <FamilyRulesManager
+              familyId={currentFamily.id}
+              editorProfileId={currentProfile.id}
+              theme="child"
             />
-          </div>
-
-          <TodayTaskPointsPanel summary={pointsSummary} variant="homeCard" />
-
-          {progress === 100 && (
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              className="flex items-center gap-2 bg-green-50 rounded-2xl px-4 py-3 mt-3"
-            >
-              <span className="text-2xl">🎉</span>
-              <p className="text-green-700 font-bold text-sm">きょうのタスク ぜんぶ おわり！</p>
-            </motion.div>
-          )}
-        </motion.div>
+          </motion.div>
+        )}
 
         {/* Today's tasks */}
         <div>
@@ -169,32 +147,6 @@ export default function ChildHomePage() {
             </AnimatePresence>
           </div>
         </div>
-
-        {/* 家族のルールBOX（親ダッシュボードと同じ内容を参照） */}
-        {currentFamily && state.familyRules.filter(r => r.familyId === currentFamily.id).length > 0 && (
-          <div>
-            <h2 className="font-black text-gray-700 text-base mb-3 px-1">📜 かぞくのルールBOX</h2>
-            <div className="space-y-2">
-              {state.familyRules
-                .filter(r => r.familyId === currentFamily.id)
-                .map((rule, i) => (
-                  <motion.div
-                    key={rule.id}
-                    initial={{ opacity: 0, y: 5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 + i * 0.05 }}
-                    className="bg-white rounded-2xl px-4 py-3 shadow-sm border-2 border-purple-100 flex items-start gap-3"
-                  >
-                    <span className="text-xl flex-shrink-0">📜</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-black text-gray-800 text-sm">{rule.title}</p>
-                      <p className="text-gray-600 text-xs mt-1 leading-relaxed">{rule.content}</p>
-                    </div>
-                  </motion.div>
-                ))}
-            </div>
-          </div>
-        )}
 
         {/* Shortcut cards */}
         <div className="grid grid-cols-2 gap-3">
