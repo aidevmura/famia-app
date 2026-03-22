@@ -5,11 +5,13 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Star, ShoppingBag, CheckCircle } from 'lucide-react'
 import { useStore } from '@/lib/store'
 import BottomNav from '@/components/BottomNav'
+import TodayTaskPointsPanel from '@/components/TodayTaskPointsPanel'
 import { CATEGORY_LABELS, RARITY_LABELS } from '@/lib/avatar-items'
+import { getTodayTaskPointsSummary } from '@/lib/utils'
 import type { AvatarItem } from '@/types'
 
 export default function ChildShopPage() {
-  const { currentProfile, state, purchaseItem } = useStore()
+  const { currentProfile, state, purchaseItem, getTodayTasks, isTaskCompletedToday } = useStore()
   const [activeCategory, setActiveCategory] = useState<string>('all')
   const [ownershipFilter, setOwnershipFilter] = useState<'all' | 'owned' | 'notOwned'>('all')
   const [buyConfirm, setBuyConfirm] = useState<AvatarItem | null>(null)
@@ -40,6 +42,14 @@ export default function ChildShopPage() {
   const ownedCount = allItems.filter(i => ownedIds.includes(i.id)).length
   const notOwnedCount = allItems.filter(i => !ownedIds.includes(i.id)).length
 
+  const todayTasks = getTodayTasks(currentProfile.id)
+  const pointsSummary = getTodayTaskPointsSummary(
+    state,
+    currentProfile.id,
+    todayTasks,
+    isTaskCompletedToday
+  )
+
   const handleBuy = (item: AvatarItem) => {
     if (currentProfile.pointsTotal < item.pointsCost) return
     purchaseItem(item, currentProfile.id)
@@ -55,12 +65,15 @@ export default function ChildShopPage() {
         <div className="max-w-lg mx-auto">
           <h1 className="text-2xl font-black mb-1">🛍️ アイテムショップ</h1>
           <p className="text-yellow-100 text-sm">ポイントでアイテムをゲットしよう！</p>
-          <div className="flex items-center gap-2 mt-3">
-            <div className="bg-white/30 rounded-xl px-3 py-2 flex items-center gap-2">
-              <Star size={16} fill="currentColor" className="text-yellow-900" />
-              <span className="font-black text-yellow-900 text-lg">{currentProfile.pointsTotal}pt</span>
+          <div className="flex flex-wrap items-start gap-3 mt-3">
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <div className="bg-white/30 rounded-xl px-3 py-2 flex items-center gap-2">
+                <Star size={16} fill="currentColor" className="text-yellow-900" />
+                <span className="font-black text-yellow-900 text-lg">{currentProfile.pointsTotal}pt</span>
+              </div>
+              <span className="text-yellow-100 text-sm font-medium">もってる</span>
             </div>
-            <span className="text-yellow-100 text-sm font-medium">もってるポイント</span>
+            <TodayTaskPointsPanel summary={pointsSummary} variant="shop" />
           </div>
         </div>
       </div>

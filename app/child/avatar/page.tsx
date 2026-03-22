@@ -7,12 +7,14 @@ import { ja } from 'date-fns/locale'
 import { useStore } from '@/lib/store'
 import FamiaAvatar from '@/components/FamiaAvatar'
 import BottomNav from '@/components/BottomNav'
+import TodayTaskPointsPanel from '@/components/TodayTaskPointsPanel'
 import { CATEGORY_LABELS, RARITY_LABELS } from '@/lib/avatar-items'
+import { getTodayTaskPointsSummary } from '@/lib/utils'
 
 type TabType = 'dressup' | 'collection'
 
 export default function ChildAvatarPage() {
-  const { currentProfile, state, getOwnedItems, equipItem } = useStore()
+  const { currentProfile, state, getOwnedItems, equipItem, getTodayTasks, isTaskCompletedToday } = useStore()
   const [activeTab, setActiveTab] = useState<TabType>('dressup')
   const [activeCategory, setActiveCategory] = useState<string>('hair')
 
@@ -31,6 +33,14 @@ export default function ChildAvatarPage() {
     const item = state.avatarItems.find(i => i.id === uai.itemId)
     return { uai, item }
   }).filter(({ item }) => item !== undefined)
+
+  const todayTasks = getTodayTasks(currentProfile.id)
+  const pointsSummary = getTodayTaskPointsSummary(
+    state,
+    currentProfile.id,
+    todayTasks,
+    isTaskCompletedToday
+  )
 
   return (
     <div className="min-h-dvh bg-gradient-to-b from-purple-100 to-pink-50 pb-28">
@@ -59,6 +69,8 @@ export default function ChildAvatarPage() {
             <span className="text-sm font-black">🎁 {ownedItems.length}こ</span>
             <span className="text-xs text-purple-200">もってる！</span>
           </div>
+
+          <TodayTaskPointsPanel summary={pointsSummary} variant="avatar" />
         </div>
       </div>
 

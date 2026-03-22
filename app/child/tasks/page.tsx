@@ -6,6 +6,8 @@ import { useStore } from '@/lib/store'
 import TaskCard from '@/components/TaskCard'
 import CelebrationModal from '@/components/CelebrationModal'
 import BottomNav from '@/components/BottomNav'
+import TodayTaskPointsPanel from '@/components/TodayTaskPointsPanel'
+import { getTodayTaskPointsSummary } from '@/lib/utils'
 
 export default function ChildTasksPage() {
   const { currentProfile, state, getTodayTasks, isTaskCompletedToday, completeTask, uncompleteTask } = useStore()
@@ -14,16 +16,12 @@ export default function ChildTasksPage() {
   if (!currentProfile || currentProfile.role !== 'child') return null
 
   const todayTasks = getTodayTasks(currentProfile.id)
-
-  const completedToday = todayTasks.filter(t => isTaskCompletedToday(t.id, currentProfile.id))
-  const totalPoints = completedToday.reduce((sum, t) => {
-    const comp = state.completions.find(c => c.taskId === t.id && c.userId === currentProfile.id)
-    return sum + (comp?.pointsEarned ?? 0)
-  }, 0)
-
-  const incompleteTasks = todayTasks.filter(t => !isTaskCompletedToday(t.id, currentProfile.id))
-  const remainingPointsMin = incompleteTasks.reduce((sum, t) => sum + t.pointsValue, 0)
-  const remainingPointsMax = incompleteTasks.reduce((sum, t) => sum + t.pointsValue + 5, 0)
+  const pointsSummary = getTodayTaskPointsSummary(
+    state,
+    currentProfile.id,
+    todayTasks,
+    isTaskCompletedToday
+  )
 
   const handleComplete = (task: (typeof todayTasks)[0], selfInitiated: boolean) => {
     completeTask(task, currentProfile.id, selfInitiated)
@@ -41,38 +39,7 @@ export default function ChildTasksPage() {
         <div className="max-w-lg mx-auto">
           <h1 className="text-2xl font-black mb-1">📋 タスクいちらん</h1>
           <p className="text-purple-200 text-sm">{currentProfile.name}ちゃんのきょうのタスク</p>
-          <div className="flex flex-wrap items-center gap-2 mt-3">
-            <div className="bg-white/20 rounded-xl px-3 py-1.5 text-sm font-bold">
-              ✅ {completedToday.length}/{todayTasks.length}こ おわり
-            </div>
-            <div className="bg-yellow-400 text-yellow-900 rounded-xl px-3 py-1.5 text-sm font-bold">
-              ⭐ きょう <span className="font-black">{totalPoints}pt</span> ゲット済み
-            </div>
-          </div>
-
-          {incompleteTasks.length > 0 && (
-            <div className="mt-3 bg-white/15 rounded-2xl px-3 py-2.5 text-sm">
-              <p className="text-white font-bold leading-snug">
-                のこりのタスクをぜんぶやったら、あと{' '}
-                <span className="text-yellow-200 font-black">
-                  {remainingPointsMin === remainingPointsMax
-                    ? `${remainingPointsMin}pt`
-                    : `${remainingPointsMin}〜${remainingPointsMax}pt`}
-                </span>{' '}
-                もらえるよ
-              </p>
-              {remainingPointsMin !== remainingPointsMax && (
-                <p className="text-purple-200 text-xs mt-1">
-                  （ふつうに「やった！」なら {remainingPointsMin}pt、全部「ひとりでできた！」なら {remainingPointsMax}pt）
-                </p>
-              )}
-            </div>
-          )}
-          {incompleteTasks.length === 0 && todayTasks.length > 0 && (
-            <p className="mt-3 text-purple-100 text-sm font-bold">
-              🎉 きょうのタスクのポイントは ぜんぶゲットしたよ！
-            </p>
-          )}
+          <TodayTaskPointsPanel summary={pointsSummary} variant="tasksHeader" showCompletionBadge />
         </div>
       </div>
 
@@ -107,7 +74,7 @@ export default function ChildTasksPage() {
         </div>
 
         {/* Weekly overview hint */}
-        {completedToday.length === todayTasks.length && todayTasks.length > 0 && (
+        {pointsSummary.completedCount === pointsSummary.totalCount && todayTasks.length > 0 && (
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}

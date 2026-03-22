@@ -10,8 +10,10 @@ import FamiaAvatar from '@/components/FamiaAvatar'
 import TaskCard from '@/components/TaskCard'
 import CelebrationModal from '@/components/CelebrationModal'
 import BottomNav from '@/components/BottomNav'
+import TodayTaskPointsPanel from '@/components/TodayTaskPointsPanel'
 import { format } from 'date-fns'
 import { ja } from 'date-fns/locale'
+import { getTodayTaskPointsSummary } from '@/lib/utils'
 
 export default function ChildHomePage() {
   const router = useRouter()
@@ -31,8 +33,13 @@ export default function ChildHomePage() {
   const completedCount = todayTasks.filter(t => isTaskCompletedToday(t.id, currentProfile.id)).length
   const totalCount = todayTasks.length
   const progress = totalCount > 0 ? (completedCount / totalCount) * 100 : 0
-  const todayPoints = currentProfile.pointsTotal
   const todayDate = format(new Date(), 'M月d日(E)', { locale: ja })
+  const pointsSummary = getTodayTaskPointsSummary(
+    state,
+    currentProfile.id,
+    todayTasks,
+    isTaskCompletedToday
+  )
 
   const getMotivationMessage = () => {
     if (completedCount === 0) return 'きょうもがんばろう！🌟'
@@ -73,23 +80,25 @@ export default function ChildHomePage() {
             </button>
           </div>
 
-          {/* Avatar + Points */}
-          <div className="flex items-center gap-4">
+          {/* Avatar + もってるポイント + きょうのタスクポイント */}
+          <div className="flex items-start gap-3">
             <motion.div
               animate={{ y: [0, -5, 0] }}
               transition={{ duration: 3, repeat: Infinity }}
-              className="bg-white/20 rounded-2xl p-2"
+              className="bg-white/20 rounded-2xl p-2 flex-shrink-0"
             >
               <FamiaAvatar config={currentProfile.avatarConfig} size={72} />
             </motion.div>
 
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
+            <div className="flex-1 min-w-0 space-y-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <div className="bg-yellow-400 rounded-xl px-3 py-1.5 flex items-center gap-1.5 shadow-sm">
                   <Star size={16} className="text-yellow-900" fill="currentColor" />
                   <span className="font-black text-yellow-900 text-lg">{currentProfile.pointsTotal}pt</span>
                 </div>
+                <span className="text-purple-200 text-xs font-bold">もってる</span>
               </div>
+              <TodayTaskPointsPanel summary={pointsSummary} variant="homeHeader" />
               <p className="text-white/90 font-bold text-sm">{getMotivationMessage()}</p>
             </div>
           </div>
@@ -120,11 +129,13 @@ export default function ChildHomePage() {
             />
           </div>
 
+          <TodayTaskPointsPanel summary={pointsSummary} variant="homeCard" />
+
           {progress === 100 && (
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              className="flex items-center gap-2 bg-green-50 rounded-2xl px-4 py-3"
+              className="flex items-center gap-2 bg-green-50 rounded-2xl px-4 py-3 mt-3"
             >
               <span className="text-2xl">🎉</span>
               <p className="text-green-700 font-bold text-sm">きょうのタスク ぜんぶ おわり！</p>

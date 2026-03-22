@@ -2,6 +2,43 @@ import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import { format, isToday, isYesterday } from 'date-fns'
 import { ja } from 'date-fns/locale'
+import type { AppState, Task } from '@/types'
+
+/** きょうのタスクに関するポイント集計（ゲット済み・のこりの見込み） */
+export interface TodayTaskPointsSummary {
+  earnedToday: number
+  remainingMin: number
+  remainingMax: number
+  completedCount: number
+  totalCount: number
+}
+
+export function getTodayTaskPointsSummary(
+  state: AppState,
+  userId: string,
+  todayTasks: Task[],
+  isTaskCompletedToday: (taskId: string, userId: string) => boolean
+): TodayTaskPointsSummary {
+  const today = format(new Date(), 'yyyy-MM-dd')
+  let earnedToday = 0
+  for (const t of todayTasks) {
+    if (!isTaskCompletedToday(t.id, userId)) continue
+    const comp = state.completions.find(
+      c => c.taskId === t.id && c.userId === userId && c.completedDate === today
+    )
+    earnedToday += comp?.pointsEarned ?? 0
+  }
+  const incomplete = todayTasks.filter(t => !isTaskCompletedToday(t.id, userId))
+  const remainingMin = incomplete.reduce((s, t) => s + t.pointsValue, 0)
+  const remainingMax = incomplete.reduce((s, t) => s + t.pointsValue + 5, 0)
+  return {
+    earnedToday,
+    remainingMin,
+    remainingMax,
+    completedCount: todayTasks.length - incomplete.length,
+    totalCount: todayTasks.length,
+  }
+}
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))

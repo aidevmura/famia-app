@@ -10,7 +10,8 @@ import FamiaAvatar from '@/components/FamiaAvatar'
 import BottomNav from '@/components/BottomNav'
 import { format } from 'date-fns'
 import { ja } from 'date-fns/locale'
-import { CATEGORY_LABELS, FREQUENCY_LABELS } from '@/lib/utils'
+import { CATEGORY_LABELS, FREQUENCY_LABELS, getTodayTaskPointsSummary } from '@/lib/utils'
+import TodayTaskPointsPanel from '@/components/TodayTaskPointsPanel'
 
 export default function ParentHomePage() {
   const router = useRouter()
@@ -68,6 +69,7 @@ export default function ParentHomePage() {
             const done = tasks.filter(t => isTaskCompletedToday(t.id, child.id)).length
             const progress = tasks.length > 0 ? (done / tasks.length) * 100 : 0
             const isExpanded = expandedChild === child.id
+            const childPointsSummary = getTodayTaskPointsSummary(state, child.id, tasks, isTaskCompletedToday)
 
             return (
               <motion.div
@@ -110,6 +112,10 @@ export default function ParentHomePage() {
                   </div>
                   <p className="text-xs text-gray-500 mt-1.5 text-right">{Math.round(progress)}% 達成</p>
                 </button>
+
+                <div className="px-4 pb-3 -mt-1">
+                  <TodayTaskPointsPanel summary={childPointsSummary} variant="parentCard" />
+                </div>
 
                 {/* 展開：今日のタスク一覧 */}
                 <AnimatePresence>
