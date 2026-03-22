@@ -37,6 +37,22 @@ export default function LoginPage() {
     router.replace('/parent')
   }
 
+  const handleDemoLogin = async (demoName: string, demoPassword: string) => {
+    setError('')
+    setLoading(true)
+    setName(demoName)
+    setPassword(demoPassword)
+    await new Promise(r => setTimeout(r, 400))
+    const profile = state.profiles.find(
+      p => p.name === demoName && p.role === 'parent' && p.passwordHash === demoPassword
+    )
+    if (profile) {
+      dispatch({ type: 'LOGIN', payload: { userId: profile.id, familyId: profile.familyId } })
+      router.replace('/parent')
+    }
+    setLoading(false)
+  }
+
   return (
     <div className="min-h-dvh bg-gradient-to-b from-purple-100 to-pink-50 flex flex-col px-6 py-8">
       <Link href="/" className="flex items-center gap-2 text-gray-500 hover:text-purple-600 mb-8 w-fit">
@@ -108,8 +124,33 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-8 pt-6 border-t border-purple-100">
-            <p className="text-center text-gray-500 font-medium mb-4">こどもはこちら</p>
+          {/* Demo quick login */}
+          <div className="mt-6 pt-5 border-t border-purple-100">
+            <p className="text-center text-xs font-bold text-gray-400 mb-3">🎮 デモ用かんたんログイン</p>
+            <div className="grid grid-cols-2 gap-2 mb-5">
+              <button
+                type="button"
+                onClick={() => handleDemoLogin('パパ', 'papa123')}
+                disabled={loading}
+                className="bg-blue-50 border-2 border-blue-200 rounded-2xl py-3 px-2 text-center hover:bg-blue-100 active:scale-95 transition-all disabled:opacity-50"
+              >
+                <div className="text-2xl mb-1">👨</div>
+                <div className="text-xs font-black text-blue-700">パパ</div>
+                <div className="text-xs text-blue-400 font-mono">papa123</div>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDemoLogin('ママ', 'kino123')}
+                disabled={loading}
+                className="bg-pink-50 border-2 border-pink-200 rounded-2xl py-3 px-2 text-center hover:bg-pink-100 active:scale-95 transition-all disabled:opacity-50"
+              >
+                <div className="text-2xl mb-1">👩</div>
+                <div className="text-xs font-black text-pink-700">ママ</div>
+                <div className="text-xs text-pink-400 font-mono">kino123</div>
+              </button>
+            </div>
+
+            <p className="text-center text-gray-500 font-medium mb-3">こどもはこちら</p>
             <Link
               href="/child-select"
               className="block w-full bg-gradient-to-r from-yellow-400 to-orange-400 text-white font-black text-lg py-4 rounded-2xl shadow-lg text-center active:scale-95"

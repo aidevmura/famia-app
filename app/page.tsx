@@ -97,8 +97,9 @@ export default function LandingPage() {
 
           {/* Demo hint */}
           <p className="text-xs text-gray-400 mt-2">
-            🎮 デモモード：パパ（papa / papa123）または<br />
-            きこ（ファミリーコード: KIKO01 → 🐱🐰🐻）
+            🎮 デモ：パパ（なまえ: パパ / パスワード: papa123）<br />
+            ママ（なまえ: ママ / パスワード: kino123）<br />
+            きこ（コード: KIKO01 → 🐱🐰🐻）
           </p>
         </motion.div>
       </div>

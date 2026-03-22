@@ -83,6 +83,11 @@ function ChildLoginContent() {
               ❌ {error}
             </motion.div>
           )}
+
+          {/* Demo hint */}
+          <p className="mt-4 text-xs text-orange-300 font-bold">
+            🎮 デモ：🐱 → 🐰 → 🐻 のじゅんばんで！
+          </p>
         </motion.div>
       </div>
     </div>

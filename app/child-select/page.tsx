@@ -109,6 +109,15 @@ export default function ChildSelectPage() {
             >
               つぎへ →
             </button>
+
+            {/* Demo hint */}
+            <button
+              type="button"
+              onClick={() => setFamilyCode('KIKO01')}
+              className="w-full text-xs text-orange-400 font-bold py-2 hover:text-orange-600 transition-colors"
+            >
+              🎮 デモコードをいれる（KIKO01）
+            </button>
           </form>
         </motion.div>
       </div>
