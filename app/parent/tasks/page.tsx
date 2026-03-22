@@ -3,25 +3,36 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { Plus, Trash2, ToggleLeft, ToggleRight } from 'lucide-react'
+import { Plus, Trash2, ToggleLeft, ToggleRight, CheckCircle2, Circle } from 'lucide-react'
 import { useStore } from '@/lib/store'
 import BottomNav from '@/components/BottomNav'
 import { CATEGORY_LABELS, FREQUENCY_LABELS } from '@/lib/utils'
 import { cn } from '@/lib/utils'
+import { format } from 'date-fns'
 
 export default function ParentTasksPage() {
-  const { currentProfile, state, dispatch, currentFamily, getChildProfiles } = useStore()
+  const { currentProfile, state, dispatch, currentFamily, getChildProfiles, isTaskCompletedToday } = useStore()
   const [filter, setFilter] = useState<string>('all')
+  const [childFilter, setChildFilter] = useState<string>('all')
 
   if (!currentProfile || currentProfile.role !== 'parent' || !currentFamily) return null
 
   const children = getChildProfiles()
   const tasks = state.tasks.filter(t => t.familyId === currentFamily.id)
-  const filteredTasks = filter === 'all' ? tasks : filter === 'inactive'
-    ? tasks.filter(t => !t.isActive)
-    : tasks.filter(t => t.isActive && (filter === 'category-all' || t.category === filter))
+
+  const childFilteredTasks = childFilter === 'all'
+    ? tasks
+    : tasks.filter(t => t.assignedTo === childFilter)
+
+  const filteredTasks = filter === 'all'
+    ? childFilteredTasks
+    : filter === 'inactive'
+    ? childFilteredTasks.filter(t => !t.isActive)
+    : childFilteredTasks.filter(t => t.isActive && t.category === filter)
 
   const activeTasks = tasks.filter(t => t.isActive)
+
+  const today = format(new Date(), 'yyyy-MM-dd')
 
   const getAssigneeName = (assignedTo: string | null) => {
     if (!assignedTo) return '全員'
@@ -60,7 +71,32 @@ export default function ParentTasksPage() {
           新しいタスクを追加
         </Link>
 
-        {/* Category filter */}
+        {/* 子どもフィルター */}
+        {children.length > 1 && (
+          <div className="flex gap-2 overflow-x-auto pb-2 mb-3">
+            <button
+              onClick={() => setChildFilter('all')}
+              className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                childFilter === 'all' ? 'bg-purple-600 text-white' : 'bg-white text-gray-500 border border-gray-200'
+              }`}
+            >
+              👨‍👩‍👧 全員
+            </button>
+            {children.map(child => (
+              <button
+                key={child.id}
+                onClick={() => setChildFilter(child.id)}
+                className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                  childFilter === child.id ? 'bg-purple-600 text-white' : 'bg-white text-gray-500 border border-gray-200'
+                }`}
+              >
+                {child.name}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* カテゴリフィルター */}
         <div className="flex gap-2 overflow-x-auto pb-2 mb-4">
           {[
             { key: 'all', label: 'ぜんぶ' },
@@ -86,6 +122,8 @@ export default function ParentTasksPage() {
         <div className="space-y-3">
           {filteredTasks.map((task, i) => {
             const cat = CATEGORY_LABELS[task.category]
+            const assigneeId = task.assignedTo
+            const completedToday = assigneeId ? isTaskCompletedToday(task.id, assigneeId) : false
             return (
               <motion.div
                 key={task.id}
@@ -94,13 +132,23 @@ export default function ParentTasksPage() {
                 transition={{ delay: i * 0.05 }}
                 className={cn(
                   'bg-white rounded-2xl p-4 shadow-sm border-2',
+                  completedToday ? 'border-green-200 bg-green-50' :
                   task.isActive ? 'border-blue-100' : 'border-gray-100 opacity-50'
                 )}
               >
                 <div className="flex items-start gap-3">
                   <div className="text-2xl mt-0.5">{task.emoji}</div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-gray-800">{task.title}</p>
+                    <div className="flex items-center gap-2">
+                      <p className={cn('font-bold', completedToday ? 'text-green-700' : 'text-gray-800')}>
+                        {task.title}
+                      </p>
+                      {completedToday && (
+                        <span className="flex items-center gap-1 text-xs font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded-full">
+                          <CheckCircle2 size={11} />今日完了
+                        </span>
+                      )}
+                    </div>
                     {task.description && (
                       <p className="text-xs text-gray-500 mt-0.5">{task.description}</p>
                     )}
