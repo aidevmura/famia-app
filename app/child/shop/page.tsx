@@ -11,6 +11,7 @@ import type { AvatarItem } from '@/types'
 export default function ChildShopPage() {
   const { currentProfile, state, purchaseItem } = useStore()
   const [activeCategory, setActiveCategory] = useState<string>('all')
+  const [ownershipFilter, setOwnershipFilter] = useState<'all' | 'owned' | 'notOwned'>('all')
   const [buyConfirm, setBuyConfirm] = useState<AvatarItem | null>(null)
   const [justPurchased, setJustPurchased] = useState<string | null>(null)
 
@@ -24,11 +25,20 @@ export default function ChildShopPage() {
     item => item.gender === 'both' || item.gender === currentProfile.gender
   )
 
-  const filteredItems = activeCategory === 'all'
+  const categoryFiltered = activeCategory === 'all'
     ? allItems
     : allItems.filter(item => item.category === activeCategory)
 
+  const filteredItems = ownershipFilter === 'owned'
+    ? categoryFiltered.filter(item => ownedIds.includes(item.id))
+    : ownershipFilter === 'notOwned'
+    ? categoryFiltered.filter(item => !ownedIds.includes(item.id))
+    : categoryFiltered
+
   const categories = ['all', ...new Set(allItems.map(i => i.category))]
+
+  const ownedCount = allItems.filter(i => ownedIds.includes(i.id)).length
+  const notOwnedCount = allItems.filter(i => !ownedIds.includes(i.id)).length
 
   const handleBuy = (item: AvatarItem) => {
     if (currentProfile.pointsTotal < item.pointsCost) return
@@ -56,7 +66,34 @@ export default function ChildShopPage() {
       </div>
 
       <div className="max-w-lg mx-auto px-5 mt-5">
-        {/* Category filter */}
+
+        {/* 絞り込み①：持っているか */}
+        <p className="text-xs font-black text-gray-400 mb-2">① もちものフィルター</p>
+        <div className="grid grid-cols-3 gap-2 mb-4">
+          {([
+            { key: 'all',      label: 'ぜんぶ',       sub: `${allItems.length}こ`,     color: 'bg-orange-500' },
+            { key: 'owned',    label: 'もってる',      sub: `${ownedCount}こ`,           color: 'bg-green-500' },
+            { key: 'notOwned', label: 'まだない',      sub: `${notOwnedCount}こ`,        color: 'bg-purple-500' },
+          ] as const).map(f => (
+            <button
+              key={f.key}
+              onClick={() => setOwnershipFilter(f.key)}
+              className={`rounded-2xl py-2.5 px-2 text-center transition-all active:scale-95 border-2 ${
+                ownershipFilter === f.key
+                  ? `${f.color} text-white border-transparent shadow-md`
+                  : 'bg-white text-gray-500 border-gray-200'
+              }`}
+            >
+              <div className="text-sm font-black">{f.label}</div>
+              <div className={`text-xs mt-0.5 ${ownershipFilter === f.key ? 'text-white/80' : 'text-gray-400'}`}>
+                {f.sub}
+              </div>
+            </button>
+          ))}
+        </div>
+
+        {/* 絞り込み②：カテゴリ */}
+        <p className="text-xs font-black text-gray-400 mb-2">② カテゴリフィルター</p>
         <div className="flex gap-2 overflow-x-auto pb-2 mb-5">
           {categories.map(cat => {
             const label = cat === 'all'
@@ -77,6 +114,19 @@ export default function ChildShopPage() {
             )
           })}
         </div>
+
+        {/* 現在の絞り込み結果 */}
+        <p className="text-xs text-gray-400 font-bold mb-3">
+          {filteredItems.length}こ表示中
+          {(ownershipFilter !== 'all' || activeCategory !== 'all') && (
+            <button
+              onClick={() => { setOwnershipFilter('all'); setActiveCategory('all') }}
+              className="ml-2 text-orange-400 underline"
+            >
+              リセット
+            </button>
+          )}
+        </p>
 
         {/* Items grid */}
         <div className="grid grid-cols-2 gap-3">
