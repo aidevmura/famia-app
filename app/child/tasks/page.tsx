@@ -6,30 +6,24 @@ import { useStore } from '@/lib/store'
 import TaskCard from '@/components/TaskCard'
 import CelebrationModal from '@/components/CelebrationModal'
 import BottomNav from '@/components/BottomNav'
-import { CATEGORY_LABELS, FREQUENCY_LABELS } from '@/lib/utils'
-
-const FILTERS = [
-  { key: 'all', label: 'ぜんぶ' },
-  { key: 'routine', label: 'ルーティン' },
-  { key: 'chore', label: 'おてつだい' },
-  { key: 'habit', label: 'しゅうかん' },
-]
 
 export default function ChildTasksPage() {
   const { currentProfile, state, getTodayTasks, isTaskCompletedToday, completeTask, uncompleteTask } = useStore()
-  const [filter, setFilter] = useState('all')
   const [celebration, setCelebration] = useState<{ points: number; message: string } | null>(null)
 
   if (!currentProfile || currentProfile.role !== 'child') return null
 
   const todayTasks = getTodayTasks(currentProfile.id)
-  const filteredTasks = filter === 'all' ? todayTasks : todayTasks.filter(t => t.category === filter)
 
   const completedToday = todayTasks.filter(t => isTaskCompletedToday(t.id, currentProfile.id))
   const totalPoints = completedToday.reduce((sum, t) => {
     const comp = state.completions.find(c => c.taskId === t.id && c.userId === currentProfile.id)
     return sum + (comp?.pointsEarned ?? 0)
   }, 0)
+
+  const incompleteTasks = todayTasks.filter(t => !isTaskCompletedToday(t.id, currentProfile.id))
+  const remainingPointsMin = incompleteTasks.reduce((sum, t) => sum + t.pointsValue, 0)
+  const remainingPointsMax = incompleteTasks.reduce((sum, t) => sum + t.pointsValue + 5, 0)
 
   const handleComplete = (task: (typeof todayTasks)[0], selfInitiated: boolean) => {
     completeTask(task, currentProfile.id, selfInitiated)
@@ -47,44 +41,51 @@ export default function ChildTasksPage() {
         <div className="max-w-lg mx-auto">
           <h1 className="text-2xl font-black mb-1">📋 タスクいちらん</h1>
           <p className="text-purple-200 text-sm">{currentProfile.name}ちゃんのきょうのタスク</p>
-          <div className="flex items-center gap-3 mt-3">
+          <div className="flex flex-wrap items-center gap-2 mt-3">
             <div className="bg-white/20 rounded-xl px-3 py-1.5 text-sm font-bold">
               ✅ {completedToday.length}/{todayTasks.length}こ おわり
             </div>
             <div className="bg-yellow-400 text-yellow-900 rounded-xl px-3 py-1.5 text-sm font-bold">
-              ⭐ きょう +{totalPoints}pt
+              ⭐ きょう <span className="font-black">{totalPoints}pt</span> ゲット済み
             </div>
           </div>
+
+          {incompleteTasks.length > 0 && (
+            <div className="mt-3 bg-white/15 rounded-2xl px-3 py-2.5 text-sm">
+              <p className="text-white font-bold leading-snug">
+                のこりのタスクをぜんぶやったら、あと{' '}
+                <span className="text-yellow-200 font-black">
+                  {remainingPointsMin === remainingPointsMax
+                    ? `${remainingPointsMin}pt`
+                    : `${remainingPointsMin}〜${remainingPointsMax}pt`}
+                </span>{' '}
+                もらえるよ
+              </p>
+              {remainingPointsMin !== remainingPointsMax && (
+                <p className="text-purple-200 text-xs mt-1">
+                  （ふつうに「やった！」なら {remainingPointsMin}pt、全部「ひとりでできた！」なら {remainingPointsMax}pt）
+                </p>
+              )}
+            </div>
+          )}
+          {incompleteTasks.length === 0 && todayTasks.length > 0 && (
+            <p className="mt-3 text-purple-100 text-sm font-bold">
+              🎉 きょうのタスクのポイントは ぜんぶゲットしたよ！
+            </p>
+          )}
         </div>
       </div>
 
       <div className="max-w-lg mx-auto px-5 mt-5">
-        {/* Filter tabs */}
-        <div className="flex gap-2 overflow-x-auto pb-2 mb-5 scrollbar-hide">
-          {FILTERS.map(f => (
-            <button
-              key={f.key}
-              onClick={() => setFilter(f.key)}
-              className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-bold transition-all ${
-                filter === f.key
-                  ? 'bg-purple-500 text-white shadow-sm'
-                  : 'bg-white text-gray-500 border border-gray-200'
-              }`}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
-
         {/* Task list */}
         <div className="space-y-3">
-          {filteredTasks.length === 0 ? (
+          {todayTasks.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">🎉</div>
               <p className="text-gray-500 font-bold">きょうのタスクは ないよ！</p>
             </div>
           ) : (
-            filteredTasks.map((task, i) => {
+            todayTasks.map((task, i) => {
               const isCompleted = isTaskCompletedToday(task.id, currentProfile.id)
               return (
                 <motion.div

@@ -15,7 +15,7 @@ import { ja } from 'date-fns/locale'
 
 export default function ChildHomePage() {
   const router = useRouter()
-  const { currentProfile, state, dispatch, getTodayTasks, isTaskCompletedToday, completeTask, uncompleteTask } = useStore()
+  const { currentProfile, currentFamily, state, dispatch, getTodayTasks, isTaskCompletedToday, completeTask, uncompleteTask } = useStore()
   const [celebration, setCelebration] = useState<{ points: number; message: string; selfInitiated: boolean } | null>(null)
   const [lastPoints, setLastPoints] = useState(0)
 
@@ -158,6 +158,32 @@ export default function ChildHomePage() {
             </AnimatePresence>
           </div>
         </div>
+
+        {/* 家族のルールBOX（親ダッシュボードと同じ内容を参照） */}
+        {currentFamily && state.familyRules.filter(r => r.familyId === currentFamily.id).length > 0 && (
+          <div>
+            <h2 className="font-black text-gray-700 text-base mb-3 px-1">📜 かぞくのルールBOX</h2>
+            <div className="space-y-2">
+              {state.familyRules
+                .filter(r => r.familyId === currentFamily.id)
+                .map((rule, i) => (
+                  <motion.div
+                    key={rule.id}
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 + i * 0.05 }}
+                    className="bg-white rounded-2xl px-4 py-3 shadow-sm border-2 border-purple-100 flex items-start gap-3"
+                  >
+                    <span className="text-xl flex-shrink-0">📜</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-black text-gray-800 text-sm">{rule.title}</p>
+                      <p className="text-gray-600 text-xs mt-1 leading-relaxed">{rule.content}</p>
+                    </div>
+                  </motion.div>
+                ))}
+            </div>
+          </div>
+        )}
 
         {/* Shortcut cards */}
         <div className="grid grid-cols-2 gap-3">
